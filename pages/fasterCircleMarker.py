@@ -156,11 +156,26 @@ def main():
     colormap = cm.LinearColormap(
         colors=["blue", "green", "yellow", "red"], vmin=0, vmax=100
     )
+    # 色の末尾2桁を落とす(alpha)
+    colormap_func = lambda x: colormap(x)[:-2]
     # 色の情報を追加
-    df["color2"] = df["RandomValue2"].apply(colormap)
+    df["color2"] = df["RandomValue2"].apply(colormap_func)
+    # sliderで値による絞り込みができるように
+    min_value = df["RandomValue2"].min()
+    max_value = df["RandomValue2"].max()
+    selected_range = st.slider(
+        "RandomValue2 RangeSelect",
+        min_value=min_value,
+        max_value=max_value,
+        value=(min_value, max_value),
+    )
     # 地図に渡すデータを生成する
     # lat,lng,value,color
-    data = df[["lat", "lng", "RandomValue2", "color2"]].values.tolist()
+    filtered_df = df[
+        (df["RandomValue2"] >= selected_range[0])
+        & (df["RandomValue2"] <= selected_range[1])
+    ]
+    data = filtered_df[["lat", "lng", "RandomValue2", "color2"]].values.tolist()
     # JavaScriptコールバック関数
     # https://leafletjs.com/reference.html#circlemarker
     callback = f"""
@@ -168,7 +183,7 @@ def main():
         var point = new L.LatLng(row[0], row[1]);
         var color = row[3];
         var marker = L.circleMarker(point, {{
-            radius: 8,
+            radius: 6,
             fillColor: color,
             color: color,
             weight: 1,
