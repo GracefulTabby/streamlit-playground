@@ -9,3 +9,5 @@ folium
 streamlit-folium
 tabulate
 pyinstrument
+geopandas
+shapely

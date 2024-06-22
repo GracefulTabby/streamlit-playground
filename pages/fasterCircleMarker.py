@@ -17,8 +17,8 @@ from folium.utilities import (
     validate_location,
     parse_options,
 )
-
-import json
+import geopandas as gpd
+from shapely.geometry import Point
 
 st.set_page_config(layout="wide")
 
@@ -108,53 +108,60 @@ class FastCircleMarker(JSCSSMixin, Layer):
             self.callback = f"var callback = {callback};"
 
 
-def generate_random_japan_data(num_samples):
-    # 日本国内の緯度と経度の範囲
-    lat_min, lat_max = 24.396308, 45.551483
-    lon_min, lon_max = 122.93457, 153.986672
+@st.cache_resource
+def generate_random_japan_data(num_samples: int = 1000) -> pd.DataFrame:
+    # 日本の地理データをダウンロード
+    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+    japan = world[world.name == "Japan"]
 
-    # ランダムな緯度と経度の生成
-    latitudes = np.random.uniform(lat_min, lat_max, num_samples)
-    longitudes = np.random.uniform(lon_min, lon_max, num_samples)
+    # 日本の境界を取得
+    japan_boundary = japan.geometry.iloc[0]
+
+    # 日本の境界ボックスを取得
+    minx, miny, maxx, maxy = japan_boundary.bounds
+
+    # データポイントを生成
+    points = []
+    while len(points) < num_samples:
+        # ランダムなポイントを生成
+        point = Point(np.random.uniform(minx, maxx), np.random.uniform(miny, maxy))
+
+        # ポイントが日本の陸地内にあるかチェック
+        if japan_boundary.contains(point):
+            points.append(point)
+
+    # ジオデータフレームの作成
+    gdf = gpd.GeoDataFrame(geometry=points)
+
+    # 緯度経度を抽出
+    gdf["lat"] = gdf.geometry.y
+    gdf["lng"] = gdf.geometry.x
 
     # 3種類のランダムな数値の生成
-    random_value1 = np.random.rand(num_samples)
-    random_value2 = np.random.randint(0, 100, num_samples)
-    random_value3 = np.random.normal(50, 15, num_samples)
+    gdf["RandomValue1"] = np.random.rand(num_samples)
+    gdf["RandomValue2"] = np.random.randint(0, 100, num_samples)
+    gdf["RandomValue3"] = np.random.normal(50, 15, num_samples)
 
-    # データフレームの作成
-    data = {
-        "Latitude": latitudes,
-        "Longitude": longitudes,
-        "RandomValue1": random_value1,
-        "RandomValue2": random_value2,
-        "RandomValue3": random_value3,
-    }
-    df = pd.DataFrame(data)
+    # 通常のDataFrameに変換
+    df = pd.DataFrame(gdf.drop(columns="geometry"))
 
     return df
 
 
 def main():
     # サンプルデータ（緯度, 経度, 値）
-    df = pd.DataFrame(
-        [
-            [35.6895, 139.6917, 10],  # 東京
-            [34.6937, 135.5023, 20],  # 大阪
-            [43.0621, 141.3544, 30],  # 札幌
-        ],
-        columns=["lat", "lng", "value"],
-    )
+    df = generate_random_japan_data(10000)
     # カラーマップの作成
     colormap = cm.LinearColormap(
-        colors=["blue", "green", "yellow", "red"], vmin=0, vmax=30
+        colors=["blue", "green", "yellow", "red"], vmin=0, vmax=100
     )
     # 色の情報を追加
-    df["color"] = df["value"].apply(colormap)
+    df["color2"] = df["RandomValue2"].apply(colormap)
     # 地図に渡すデータを生成する
     # lat,lng,value,color
-    data = df[["lat", "lng", "value", "color"]].values.tolist()
+    data = df[["lat", "lng", "RandomValue2", "color2"]].values.tolist()
     # JavaScriptコールバック関数
+    # https://leafletjs.com/reference.html#circlemarker
     callback = f"""
     function (row) {{
         var point = new L.LatLng(row[0], row[1]);
@@ -167,6 +174,9 @@ def main():
             // opacity: 0.5,
             fillOpacity: 0.4,
         }});
+        var tooltip = L.tooltip({{maxWidth: '300'}});
+        tooltip.setContent('value : ' + row[2]);
+        marker.bindTooltip(tooltip);
         return marker;
     }};
     """
@@ -175,14 +185,14 @@ def main():
     m = folium.Map(location=[35.6895, 139.6917], zoom_start=5)
 
     # FastCircleMarkerを追加
-    fast_marker = FastCircleMarker(data, callback=callback)
+    fast_marker = FastCircleMarker(data, name="randomCircleMarker", callback=callback)
     fast_marker.add_to(m)
 
     # カラーマップを地図に追加
     colormap.add_to(m)
 
     # レイヤーコントロールを追加
-    folium.LayerControl().add_to(m)
+    folium.LayerControl(collapsed=False).add_to(m)
 
     # 地図を保存または表示
     m_html = m.get_root().render()
@@ -190,4 +200,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    profiler = Profiler()
+    with profiler:
+        main()
+
+    # output Streamlit
+    html_str = profiler.output_html()
+    st_html(html=html_str, height=500)
