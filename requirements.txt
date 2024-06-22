@@ -11,3 +11,4 @@ tabulate
 pyinstrument
 geopandas
 shapely
+geojson
