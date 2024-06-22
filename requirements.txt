@@ -1,0 +1,10 @@
+streamlit==1.33.0
+pandas
+numpy
+pydantic
+plotly
+pony 
+chardet
+folium
+streamlit-folium
+tabulate
