@@ -8,3 +8,4 @@ chardet
 folium
 streamlit-folium
 tabulate
+pyinstrument
