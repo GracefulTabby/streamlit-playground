@@ -6,25 +6,36 @@ from streamlit.components.v1 import html as st_html
 from collections import OrderedDict
 from pyinstrument import Profiler
 
+DATA_URL = "https://koukita.github.io/hokkaido_od_geodatabase/data/Hokkaido_OD_GeoDataBase2018.csv"
+ENCODING = "cp932"
+EXCLUDE_CONDITION = 'データ区分 != "国・都道府県機関"'
+MAP_HEIGHT = 600
+PROFILE_HEIGHT = 500
+
 
 @st.cache_resource
 def get_df() -> pd.DataFrame:
-    # https://koukita.github.io/hokkaido_od_geodatabase/data/Hokkaido_OD_GeoDataBase2018.csv
-    df = pd.read_csv(
-        "https://koukita.github.io/hokkaido_od_geodatabase/data/Hokkaido_OD_GeoDataBase2018.csv",
-        encoding="cp932",
-    ).fillna("")
-    df = df.query('データ区分 != "国・都道府県機関"')
+    df = pd.read_csv(DATA_URL, encoding=ENCODING).fillna("")
+    df = df.query(EXCLUDE_CONDITION)
     return df
 
 
-def main():
-    df = get_df()
-    # マップを作成
+def generate_map(df: pd.DataFrame) -> folium.Map:
     lon, lat = df["緯度"].mean(), df["経度"].mean()
     m = folium.Map((lon, lat))
-    # fasterMarkerClusterにイベントを追加するコールバック関数を定義
-    callback = """
+    callback = get_marker_callback()
+    data = prepare_marker_data(df)
+    fast_marker_cluster = FastMarkerCluster(
+        data,
+        callback=callback,
+        options={"maxClusterRadius": 120, "disableClusteringAtZoom": 16},
+    )
+    m.add_child(fast_marker_cluster)
+    return m
+
+
+def get_marker_callback() -> str:
+    return """
     function (row) {
         var marker = L.marker(new L.LatLng(row[0], row[1]), {color: "red"});
         var icon = L.AwesomeMarkers.icon({
@@ -71,8 +82,10 @@ def main():
         return marker
         };
     """
-    # 必要な列を抽出し、辞書形式のリストを作成
-    data = df.apply(
+
+
+def prepare_marker_data(df: pd.DataFrame) -> list:
+    return df.apply(
         lambda row: [
             row["緯度"],
             row["経度"],
@@ -91,15 +104,13 @@ def main():
         ],
         axis=1,
     ).tolist()
-    # FastMarkerClusterを作成
-    fast_marker_cluster = FastMarkerCluster(
-        data,
-        callback=callback,
-        options={"maxClusterRadius": 120, "disableClusteringAtZoom": 16},
-    )
-    m.add_child(fast_marker_cluster)
+
+
+def main():
+    df = get_df()
+    m = generate_map(df)
     html = m.get_root().render()
-    st_html(html, height=600)
+    st_html(html, height=MAP_HEIGHT)
 
 
 if __name__ == "__main__":
@@ -107,6 +118,5 @@ if __name__ == "__main__":
     with profiler:
         main()
 
-    # output Streamlit
     html_str = profiler.output_html()
-    st_html(html=html_str, height=500)
+    st_html(html=html_str, height=PROFILE_HEIGHT)
