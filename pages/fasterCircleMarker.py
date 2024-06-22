@@ -55,7 +55,7 @@ class FastCircleMarker(JSCSSMixin, Layer):
                 {{ this.callback }}
 
                 var data = {{ this.data|tojson }};
-                var layer = L.featureGroup()
+                var layer = L.featureGroup({{ this.options|tojson }});
                 
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
@@ -106,6 +106,7 @@ class FastCircleMarker(JSCSSMixin, Layer):
                 };"""
         else:
             self.callback = f"var callback = {callback};"
+        self.options = parse_options(**kwargs)
 
 
 @st.cache_resource
