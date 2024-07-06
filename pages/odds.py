@@ -3,14 +3,12 @@ import streamlit as st
 import requests
 import chardet
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
-from time import sleep
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome import service as fs
-from selenium.webdriver import ChromeOptions
 from webdriver_manager.core.os_manager import ChromeType
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+import time
 
 
 def detect_encoding(url):
@@ -34,19 +32,16 @@ def main():
 def main2():
     # https://ohenziblog.com/streamlit_cloud_for_selenium/
     # Seleniumの設定
-    options = ChromeOptions()
+    options = Options()
     options.add_argument('--headless')
-    options.add_argument("--no-sandbox")
     options.add_argument('--disable-gpu')
-    options.add_argument('--disable-dev-shm-usage')
-    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM,driver_version='120').install()
-    service = fs.Service(CHROMEDRIVER)
-    
     driver = webdriver.Chrome(
-                              options=options,
-                              service=service
-                             )
-
+        service=Service(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM,driver_version='120').install()
+        ),
+        options=options,
+    )
+    
     # 対象のレースID
     race_id = "202410030401"
 
@@ -55,10 +50,11 @@ def main2():
 
     # ページにアクセス
     driver.get(url)
-    # sleep(1)  # ページ読み込み待ち
+    time.sleep(1)  # ページ読み込み待ち
     
-    elem_table = driver.find_element_by_css_selector("table.full-name-type")
-    html = elem_table.get_attribute('outerHTML')
+    el= driver.find_element(By.CLASS_NAME, 'RaceOdds_HorseList_Table') #IDでテーブルを指定
+    html=el.get_attribute("outerHTML") #table要素を含むhtmlを取得
+    
     dfs = pd.read_html(html)    
     st.write(dfs)
 
