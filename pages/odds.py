@@ -11,6 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import time
 
+st.set_page_config(layout="wide")
+
 
 def detect_encoding(url):
     response = requests.get(url)
@@ -33,19 +35,14 @@ def main():
 def main2():
     # https://ohenziblog.com/streamlit_cloud_for_selenium/
     # Seleniumの設定
-    options = Options()
+    
+    # Using on Local
+    options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    options.accept_insecure_certs = True
-    options._ignore_local_proxy = True
-    options.add_argument('–no-sandbox')
-    options.add_experimental_option("excludeSwitches", ['enable-automation'])
-    driver = webdriver.Chrome(
-        service=Service(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-        ),
-        options=options,
-    )
+    options.add_argument('--window-size=1920,1200')
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
+                                options=options)    
     # 画面描画の待ち時間
     wait=WebDriverWait(driver,20)
     driver.implicitly_wait(30)
