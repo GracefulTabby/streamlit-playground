@@ -39,7 +39,7 @@ def main2():
     options.add_argument("--no-sandbox")
     options.add_argument('--disable-gpu')
     options.add_argument('--disable-dev-shm-usage')
-    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM,driver_version='120').install()
     service = fs.Service(CHROMEDRIVER)
     
     driver = webdriver.Chrome(
