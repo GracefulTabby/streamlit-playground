@@ -7,6 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import time
 
@@ -37,10 +38,13 @@ def main2():
     options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(
         service=Service(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM,driver_version='120').install()
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
         ),
         options=options,
     )
+    # 画面描画の待ち時間
+    wait=WebDriverWait(driver,20)
+    driver.implicitly_wait(30)
     
     # 対象のレースID
     race_id = "202410030401"
