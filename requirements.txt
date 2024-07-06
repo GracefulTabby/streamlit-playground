@@ -12,3 +12,7 @@ pyinstrument
 geopandas
 shapely
 geojson
+lxml
+html5lib
+beautifulsoup4
+selenium
