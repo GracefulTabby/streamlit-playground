@@ -16,3 +16,5 @@ lxml
 html5lib
 beautifulsoup4
 selenium
+chromium
+webdriver-manager

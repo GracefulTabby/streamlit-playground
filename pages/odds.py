@@ -6,6 +6,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from time import sleep
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome import service as fs
+from selenium.webdriver import ChromeOptions
+from webdriver_manager.core.os_manager import ChromeType
+from selenium.webdriver.common.by import By
+
 
 def detect_encoding(url):
     response = requests.get(url)
@@ -26,12 +32,20 @@ def main():
     
 
 def main2():
-
+    # https://ohenziblog.com/streamlit_cloud_for_selenium/
     # Seleniumの設定
-    options = Options()
+    options = ChromeOptions()
     options.add_argument('--headless')
     options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(options=options)
+    options.add_argument('--disable-gpu')
+    options.add_argument('--disable-dev-shm-usage')
+    CHROMEDRIVER = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    service = fs.Service(CHROMEDRIVER)
+    
+    driver = webdriver.Chrome(
+                              options=options,
+                              service=service
+                             )
 
     # 対象のレースID
     race_id = "202410030401"
@@ -63,7 +77,7 @@ def main2():
     #     st.write(f"馬番: {umaban}, オッズ: {odds}")
 
     # ブラウザを閉じる  
-    driver.quit()    
+    driver.close()    
     
     
  
