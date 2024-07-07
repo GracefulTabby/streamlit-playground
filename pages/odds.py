@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 import requests
-import chardet
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
