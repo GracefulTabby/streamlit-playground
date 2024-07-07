@@ -55,6 +55,7 @@ def main2():
 
     # ページにアクセス
     driver.get(url)
+    time.sleep(3)
     
     el= driver.find_element(By.CLASS_NAME, 'RaceOdds_HorseList_Table') #IDでテーブルを指定
     html=el.get_attribute("outerHTML") #table要素を含むhtmlを取得
