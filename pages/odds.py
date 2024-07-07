@@ -41,6 +41,7 @@ def main2():
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1200')
+    options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
                                 options=options)    
     # 画面描画の待ち時間
@@ -55,7 +56,6 @@ def main2():
 
     # ページにアクセス
     driver.get(url)
-    time.sleep(5)  # ページ読み込み待ち
     
     el= driver.find_element(By.CLASS_NAME, 'RaceOdds_HorseList_Table') #IDでテーブルを指定
     html=el.get_attribute("outerHTML") #table要素を含むhtmlを取得
