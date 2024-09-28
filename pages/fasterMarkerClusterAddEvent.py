@@ -1,10 +1,11 @@
-import streamlit as st
-import folium
-from folium.plugins import FastMarkerCluster
-import pandas as pd
-from streamlit.components.v1 import html as st_html
 from collections import OrderedDict
+
+import folium
+import pandas as pd
+import streamlit as st
+from folium.plugins import FastMarkerCluster
 from pyinstrument import Profiler
+from streamlit.components.v1 import html as st_html
 
 DATA_URL = "https://koukita.github.io/hokkaido_od_geodatabase/data/Hokkaido_OD_GeoDataBase2018.csv"
 ENCODING = "cp932"
@@ -114,6 +115,16 @@ def main():
 
 
 if __name__ == "__main__":
+    from streamlit_playground.page_routing import routing
+
+    routing()
+
+if __name__ == "__page__":
+    try:
+        st.set_page_config(layout="wide")
+    except:  # noqa
+        pass
+
     profiler = Profiler()
     with profiler:
         main()

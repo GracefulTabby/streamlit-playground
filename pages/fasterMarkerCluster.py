@@ -1,22 +1,13 @@
-import streamlit as st
-from streamlit.runtime.scriptrunner import get_script_run_ctx, add_script_run_ctx
-from streamlit.runtime.state.session_state import SessionState
-import folium
-from folium.plugins import MarkerCluster, FastMarkerCluster, FeatureGroupSubGroup
-import pandas as pd
-from streamlit.components.v1 import html as st_html
-from geojson import Feature, Point, FeatureCollection
-from collections import OrderedDict
-import pandas as pd
-import numpy as np
-import streamlit as st
-import time
-import string
 import random
-import time
-from pyinstrument import Profiler
+import string
+from collections import OrderedDict
 
-st.set_page_config(layout="wide")
+import folium
+import pandas as pd
+import streamlit as st
+from folium.plugins import FastMarkerCluster
+from pyinstrument import Profiler
+from streamlit.components.v1 import html as st_html
 
 
 def randstr(n):
@@ -203,6 +194,16 @@ def main():
 
 
 if __name__ == "__main__":
+    from streamlit_playground.page_routing import routing
+
+    routing()
+
+if __name__ == "__page__":
+    try:
+        st.set_page_config(layout="wide")
+    except:  # noqa
+        pass
+
     profiler = Profiler()
     with profiler:
         main()

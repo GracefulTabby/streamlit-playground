@@ -1,16 +1,13 @@
 import streamlit as st
-st.set_page_config(layout="wide")
 
-# `streamlit run Home.py`
+from streamlit_playground.page_routing import routing
 
 
 def main():
-    st.title("Freedom Streamlit playground!")
-    st.write("")
-    st.write(
-        "This is just a playground. A lot of code is flowing that I can't even notice."
-    )
+    routing()
+    return
 
 
 if __name__ == "__main__":
+    st.set_page_config(layout="wide")
     main()

@@ -1,26 +1,20 @@
-import pandas as pd
-import numpy as np
-import streamlit as st
-import folium
-from folium.plugins import FastMarkerCluster
-import pandas as pd
-from streamlit.components.v1 import html as st_html
-from collections import OrderedDict
-from pyinstrument import Profiler
 import branca.colormap as cm
-import json
-from jinja2 import Template
-from folium.map import Layer
+import folium
+import geopandas as gpd
+import numpy as np
+import pandas as pd
+import streamlit as st
 from folium.elements import JSCSSMixin
+from folium.map import Layer
 from folium.utilities import (
     if_pandas_df_convert_to_numpy,
-    validate_location,
     parse_options,
+    validate_location,
 )
-import geopandas as gpd
+from jinja2 import Template
+from pyinstrument import Profiler
 from shapely.geometry import Point
-
-st.set_page_config(layout="wide")
+from streamlit.components.v1 import html as st_html
 
 
 class FastCircleMarker(JSCSSMixin, Layer):
@@ -153,9 +147,7 @@ def main():
     # サンプルデータ（緯度, 経度, 値）
     df = generate_random_japan_data(10000)
     # カラーマップの作成
-    colormap = cm.LinearColormap(
-        colors=["blue", "green", "yellow", "red"], vmin=0, vmax=100
-    )
+    colormap = cm.LinearColormap(colors=["blue", "green", "yellow", "red"], vmin=0, vmax=100)
     # 色の末尾2桁を落とす(alpha)
     colormap_func = lambda x: colormap(x)[:-2]
     # 色の情報を追加
@@ -171,30 +163,27 @@ def main():
     )
     # 地図に渡すデータを生成する
     # lat,lng,value,color
-    filtered_df = df[
-        (df["RandomValue2"] >= selected_range[0])
-        & (df["RandomValue2"] <= selected_range[1])
-    ]
+    filtered_df = df[(df["RandomValue2"] >= selected_range[0]) & (df["RandomValue2"] <= selected_range[1])]
     data = filtered_df[["lat", "lng", "RandomValue2", "color2"]].values.tolist()
     # JavaScriptコールバック関数
     # https://leafletjs.com/reference.html#circlemarker
-    callback = f"""
-    function (row) {{
+    callback = """
+    function (row) {
         var point = new L.LatLng(row[0], row[1]);
         var color = row[3];
-        var marker = L.circleMarker(point, {{
+        var marker = L.circleMarker(point, {
             radius: 6,
             fillColor: color,
             color: color,
             weight: 1,
             // opacity: 0.5,
             fillOpacity: 0.4,
-        }});
-        var tooltip = L.tooltip({{maxWidth: '300'}});
+        });
+        var tooltip = L.tooltip({maxWidth: '300'});
         tooltip.setContent('value : ' + row[2]);
         marker.bindTooltip(tooltip);
         return marker;
-    }};
+    };
     """
 
     # 地図の中心とズームレベルを設定
@@ -216,6 +205,16 @@ def main():
 
 
 if __name__ == "__main__":
+    from streamlit_playground.page_routing import routing
+
+    routing()
+
+if __name__ == "__page__":
+    try:
+        st.set_page_config(layout="wide")
+    except:  # noqa
+        pass
+
     profiler = Profiler()
     with profiler:
         main()

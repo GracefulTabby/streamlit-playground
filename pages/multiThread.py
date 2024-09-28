@@ -1,12 +1,11 @@
+import random
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from streamlit.runtime.scriptrunner import add_script_run_ctx
-from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
-import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
-from threading import Lock
-import random
 
 __global_lock = Lock()
 
@@ -46,4 +45,14 @@ def main():
 
 
 if __name__ == "__main__":
+    from streamlit_playground.page_routing import routing
+
+    routing()
+
+if __name__ == "__page__":
+    try:
+        st.set_page_config(layout="wide")
+    except:  # noqa
+        pass
+
     main()
