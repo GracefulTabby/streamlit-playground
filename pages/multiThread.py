@@ -35,7 +35,7 @@ def main():
         #     f.result()
         # タスクの完了を待つ
         # concurrent.futures.wait(futures)
-        for idx, future in enumerate(as_completed(futures), start=1):
+        for idx, _ in enumerate(as_completed(futures), start=1):
             # count, result = future.result()
             # results.append((count, result))
             progress = idx / len(futures)

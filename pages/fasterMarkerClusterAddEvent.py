@@ -60,11 +60,11 @@ def get_marker_callback() -> str:
         tooltipContent += '</table>';
         tooltipContent += '</div>';
         marker.bindTooltip(tooltipContent, { direction: "top", offset: L.point(0, -10) });
-        
+
         var lat = row[0];
         var lng = row[1];
         var delta = 0.005;  // 矩形の大きさを調整するための値（度単位）
-        
+
         var bounds = [
             [lat - delta, lng - delta],
             [lat - delta, lng + delta],

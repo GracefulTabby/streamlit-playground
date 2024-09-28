@@ -6,7 +6,7 @@ select = [
     "E", # error
     "W"  # warning
 ]
-ignore = []
+ignore = ["E731"]
 fixable = ["ALL"]
 exclude = [
     ".ruff_cache"

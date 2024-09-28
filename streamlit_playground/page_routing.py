@@ -11,7 +11,7 @@ def routing():
             st.Page("pages/odds.py", title="odds"),
         ],
         "🧰 MyTools": [
-            st.Page("pages/fasterCircleMarker.py", title="fasterCircleMarker", url_path="faster-circle-marker-2"),
+            st.Page("pages/tmna_marketlink_simulator.py", title="MarketLinkSimulator"),
         ],
     }
     nav = st.navigation(pages)

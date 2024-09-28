@@ -50,7 +50,7 @@ class FastCircleMarker(JSCSSMixin, Layer):
 
                 var data = {{ this.data|tojson }};
                 var layer = L.featureGroup({{ this.options|tojson }});
-                
+
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var marker = callback(row);
