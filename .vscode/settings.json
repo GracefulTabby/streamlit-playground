@@ -3,7 +3,7 @@
         "editor.defaultFormatter": "charliermarsh.ruff", // RuffをデフォルトのフォーマッターとしてVSCodeで使用する[1]
         "editor.formatOnSave": true, // ファイル保存時に自動フォーマットを実行[1]
         "editor.codeActionsOnSave": {
-            "source.organizeImports":  "explicit", // ファイル保存時にimportの整理を実行[1]
+            "source.organizeImports":  "never", // ファイル保存時にimportの整理を実行[1]
             "source.fixAll":  "explicit" // ファイル保存時にRuffの自動修正を実行[1][3]
         }
     },

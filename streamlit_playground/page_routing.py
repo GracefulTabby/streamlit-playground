@@ -9,6 +9,7 @@ def routing():
             st.Page("pages/fasterMarkerClusterAddEvent.py", title="fasterMarkerClusterAddEvent"),
             st.Page("pages/multiThread.py", title="multiThread"),
             st.Page("pages/odds.py", title="odds"),
+            st.Page("pages/stlite.py"),
         ],
         "🧰 MyTools": [
             st.Page("pages/tmna_marketlink_simulator.py", title="MarketLinkSimulator"),
